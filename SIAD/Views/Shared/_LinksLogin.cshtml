@@ -1,0 +1,44 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SIAD.Entidades
+
+@inject SignInManager<Usuario> SignInManager
+
+<ul class="navbar-nav ml-auto">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <div class="topbar-divider d-none d-sm-block"></div>
+
+        <!-- Nav Item - User Information -->
+        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Hola, @User.Identity.Name</span>
+            <img class="img-profile rounded-circle"
+                 src="https://images.unsplash.com/photo-1519648023493-d82b5f8d7b8a?w=300">
+        </a>
+        <!-- Dropdown - User Information -->
+        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+             aria-labelledby="userDropdown">
+                <a class="dropdown-item text-center" href="@Url.Action("Perfil","Usuario")">
+                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Perfil
+            </a>
+            <div class="dropdown-divider"></div>
+                <form id="logoutForm" asp-controller="Usuario" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-user btn-block">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                        Salir
+                    </button>
+                </form>
+        </div>
+    </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Login">
+                Login
+            </a>
+        </li>
+    }
+</ul>

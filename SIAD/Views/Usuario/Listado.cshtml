@@ -1,0 +1,299 @@
+﻿@model UsuarioListViewModel
+
+@{
+    ViewData["Title"] = "Listado";
+}
+
+@section Estilos {
+    <link rel="stylesheet" href="~/vendor/datatables/dataTables.bootstrap4.min.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/vendor/datatables/extensiones/css/responsive.dataTables.min.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/vendor/datatables/extensiones/css/buttons.dataTables.min.css" asp-append-version="true">
+}
+
+@if (Model.ListaUsuariosVM.Mensaje is not null)
+{
+    <div class="alert alert-success" role="alert">
+        @Model.ListaUsuariosVM.Mensaje
+    </div>
+}
+@if (Model.ListaUsuariosVM is not null)
+{
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-second-primary">
+            <h6 class="m-0 font-weight-bold text-white">Lista de Usuarios</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <button class="btn btn-success" data-toggle="modal" data-target="#modalAdd"><i class="fas fa-user-plus"></i> Nuevo Usuario</button>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table" id="tbdata" cellspacing="0" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>MR</th>
+                                <th>Grado</th>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
+                                <th>Destino</th>
+                                <th>Depto|Div</th>
+                                <th>Interno</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var usuario in Model.ListaUsuariosVM.Usuarios)
+                            {
+
+                                <tr>
+                                    <td>1</td>
+                                    <td>@usuario.Matricula</td>
+                                    <td>@usuario.Grado</td>
+                                    <td>@usuario.Apellido</td>
+                                    <td>@usuario.Nombre</td>
+                                    <td>@usuario.Destino</td>
+                                    <td>@usuario.DeptoDiv</td>
+                                    <td>@usuario.PhoneNumber</td>
+                                    <td><span class="badge badge-info">Admin</span></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEdit" id="btnObtenerUsuario" onclick="obtenerUsuario('@usuario.Id')">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  Modal Nuevo-->
+    <div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6>Detalle Usuario</h6>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="AltaUsuario">
+                        <input type="hidden" value="0" id="txtId">
+                         <div class="row">
+                            <div class="col-sm-8">
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtMatricula">Matricula</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" asp-for="UsuarioVM.Matricula">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtGrado">Grado</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" asp-for="UsuarioVM.Grado">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtNombreApellido">Apellido y Nombre</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="apellidoInput" oninput="formarNombreUsuario()" asp-for="UsuarioVM.Apellido">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtDestino">Nombre</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="nombreInput" oninput="formarNombreUsuario()" asp-for="UsuarioVM.Nombre">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtUserName">Nombre de Usuario</label>
+
+                                        <input type="text" class="form-control form-control-sm input-validar" id="nombreUsuarioInput" readonly asp-for="UsuarioVM.UserName">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtPassword">Password</label>
+                                        <input type="password" class="form-control form-control-sm input-validar" asp-for="UsuarioVM.PasswordHash">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtDeptoDiv">Depto/Div</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" asp-for="UsuarioVM.DeptoDiv">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtInterno">Interno</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" asp-for="UsuarioVM.PhoneNumber">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="cboRol">Rol</label>
+                                        <select class="form-control form-control-sm" id="rol">
+                                            <option value="1">Admin</option>
+                                            <option value="2">Operador</option>
+                                            <option value="3">Consultor</option>
+
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtFoto">Foto</label>
+                                        <input class="form-control-file" type="file" id="txtFoto" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <img id="imgUsuario" style="max-width:200px;" src="https://images.unsplash.com/photo-1519648023493-d82b5f8d7b8a?w=300" class="rounded mx-auto d-block" alt="Foto usuario">
+                            </div>
+
+                        </div>
+                        <button class="btn btn-primary btn-user btn-block" type="submit">Guardar</button>
+                        <button class="btn btn-danger btn-sm" type="button" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--  Modal Editar-->
+    <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6>Detalle Usuario</h6>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form >
+                        <input type="hidden" value="0" id="txtId">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtMatricula">Matricula</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="matricula" name="Matricula">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtGrado">Grado</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="grado" name="Grado">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtNombreApellido">Apellido</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="apellido" name="apellido">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtDestino">Nombre</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="nombre" name="nombre">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtDeptoDiv">Destino</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="destino" name="destino">
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtPhoneNumber">Depto/Div</label>
+                                        <input type="text" class="form-control form-control-sm input-validar" id="deptoDiv" name="deptoDiv">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="cboRol">Rol</label>
+                                        <select class="form-control form-control-sm" id="rol">
+                                            <option value="1">Admin</option>
+                                            <option value="2">Operador</option>
+                                            <option value="3">Consultor</option>
+
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="txtFoto">Foto</label>
+                                        <input class="form-control-file" type="file" id="txtFoto" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <img id="imgUsuario" style="max-width:200px;" src="https://images.unsplash.com/photo-1519648023493-d82b5f8d7b8a?w=300" class="rounded mx-auto d-block" alt="Foto usuario">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary btn-sm" type="button" id="btnGuardar">Guardar</button>
+                    <button class="btn btn-danger btn-sm" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts{
+<!-- ============================================================
+=SCRIPTS PARA ESTA PAGINA
+===============================================================-->
+    <script src="~/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <script src="~/vendor/datatables/extensiones/js/dataTables.responsive.min.js"></script>
+
+    <script src="~/vendor/datatables/extensiones/js/dataTables.buttons.min.js"></script>
+    <script src="~/vendor/datatables/extensiones/js/jszip.min.js"></script>
+    <script src="~/vendor/datatables/extensiones/js/buttons.html5.min.js"></script>
+    <script src="~/vendor/datatables/extensiones/js/buttons.print.min.js"></script>
+    <script src="~/js/vistas/UsuarioEdit.js"></script>
+<!-- SOLO ES DE EJEMPLO - IGNORAR -->
+    <script src="~/js/vistas/datatables-demo.js"></script>
+
+    @*<script>
+        function obtenerUsuario(idUsuario) {
+            // Realizar la solicitud AJAX al controlador
+            fetch(`/Usuario/ObtenerUsuario?id=${idUsuario}`)
+                .then(response => response.json())
+                .then(data => {
+                    mostrarDatosUsuario(data);
+                })
+                .catch(error => {
+                    // Manejar errores de la solicitud AJAX
+                    console.error(error);
+                });
+        }
+
+        function mostrarDatosUsuario(usuario) {
+            // Obtener la referencia a la ventana modal y los elementos donde mostrar los datos
+            var modal = document.getElementById('modalEdit');
+            var nombreElemento = document.getElementById('nombreUsuario');
+            var edadElemento = document.getElementById('edadUsuario');
+            // Mostrar los datos del usuario en los elementos correspondientes
+            nombreElemento.textContent = usuario.matricula;
+            edadElemento.textContent = datos.edad;
+            // Abrir la ventana modal
+            modal.style.display = "block";
+        }
+    </script>*@
+
+    <script>
+        function formarNombreUsuario() {
+            var nombre = document.getElementById('nombreInput').value;
+            var apellido = document.getElementById('apellidoInput').value;
+
+            var primeraLetraNombre = nombre.charAt(0);
+            var nombreUsuario = primeraLetraNombre + apellido;
+
+            document.getElementById('nombreUsuarioInput').value = nombreUsuario;
+        }
+    </script>
+}

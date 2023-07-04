@@ -4,19 +4,24 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SIAD;
+using SIAD.Entidades;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+var politicaUsuariosAutenticados = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
 
+// Add services to the container.
+builder.Services.AddControllersWithViews(opciones =>
+{
+    opciones.Filters.Add(new AuthorizeFilter(politicaUsuariosAutenticados));
+});
 
 //agrego conexion a BD
 builder.Services.AddDbContext<ApplicationDbContext>(opciones => opciones.UseSqlServer("name=DefaultConnection"));
 
 builder.Services.AddAuthentication();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(opciones =>
+builder.Services.AddIdentity<Usuario, IdentityRole>(opciones =>
 {
     opciones.SignIn.RequireConfirmedAccount = false;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
@@ -24,8 +29,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opciones =>
 builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme,
     opciones =>
     {
-        opciones.LoginPath = "/usuarios/login";
-        opciones.AccessDeniedPath = "/usuarios/login";
+        opciones.LoginPath = "/Usuario/Login";
+        opciones.AccessDeniedPath = "/Usuario/Login";
     });
 
 var app = builder.Build();
@@ -48,6 +53,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Usuario}/{action=Login}/{id?}");
 
 app.Run();

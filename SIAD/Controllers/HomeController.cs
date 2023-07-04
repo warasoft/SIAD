@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SIAD.Models;
+using SIAD.Servicios;
+using System.Data;
 using System.Diagnostics;
 
 namespace SIAD.Controllers
@@ -13,12 +16,8 @@ namespace SIAD.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }
