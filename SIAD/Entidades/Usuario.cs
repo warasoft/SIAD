@@ -4,7 +4,7 @@ namespace SIAD.Entidades
 {
     public class Usuario : IdentityUser
     {
-        public int IdUsuario { get; set; }
+        public int NumeroUsuario { get; set; }        
         public int Matricula { get; set; }
         public string Grado { get; set; }
         public string Apellido { get; set; }

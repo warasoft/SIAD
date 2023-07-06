@@ -44,12 +44,12 @@
                                     <form class="user" asp-action="Login">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <div class="form-group">
-                                            <span asp-validation-for="Usuario" class="text-danger"></span>
                                             <input class="form-control form-control-user" placeholder="Usuario" asp-for="Usuario">
+                                            <span asp-validation-for="Usuario" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
-                                            <span asp-validation-for="Password" class="text-danger"></span>
                                             <input type="password" class="form-control form-control-user" placeholder="Password" asp-for="Password">
+                                            <span asp-validation-for="Password" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">

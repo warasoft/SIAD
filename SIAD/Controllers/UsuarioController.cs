@@ -30,28 +30,40 @@ namespace SIAD.Controllers
             return View();
         }
 
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult AltaUsuario()
+        {
+            return View();
+        }
+
+
         [HttpPost]
-        public async Task<IActionResult> AltaUsuario(UsuarioListViewModel modelo)
+        public async Task<IActionResult> AltaUsuario(UsuarioViewModel modelo)
         {
             if (!ModelState.IsValid)
             {
                 return View(modelo);
             }
 
+
+            int maxNumeroUsuario = await ObtenerMaxNumeroUsuario();
+
+
             var usuario = new Usuario()
             {
-                Matricula = modelo.UsuarioVM.Matricula,
-                Grado = modelo.UsuarioVM.Grado,
-                Apellido = modelo.UsuarioVM.Apellido,
-                Nombre = modelo.UsuarioVM.Nombre,
-                Destino = modelo.UsuarioVM.Destino,
-                DeptoDiv = modelo.UsuarioVM.DeptoDiv,
-                Email = modelo.UsuarioVM.Email,
-                PhoneNumber = modelo.UsuarioVM.PhoneNumber,
-                UserName = modelo.UsuarioVM.UserName
+                Matricula = modelo.Matricula,
+                Grado = modelo.Grado,
+                Apellido = modelo.Apellido,
+                Nombre = modelo.Nombre,
+                Destino = modelo.Destino,
+                DeptoDiv = modelo.DeptoDiv,
+                Email = modelo.Email,
+                PhoneNumber = modelo.Interno,
+                UserName = modelo.NombreUsuario,
+                NumeroUsuario= maxNumeroUsuario +1
             };
-
-            var usuario = await userManager.FindByIdAsync();
 
             if (usuario == null)
             {
@@ -64,7 +76,7 @@ namespace SIAD.Controllers
             userManager.Options.Password.RequireUppercase = false;
             userManager.Options.Password.RequireNonAlphanumeric = false;
 
-            var resultado = await userManager.CreateAsync(usuario, modelo.UsuarioVM.PasswordHash);
+            var resultado = await userManager.CreateAsync(usuario, modelo.Password);
 
             if (resultado.Succeeded)
             {
@@ -113,104 +125,71 @@ namespace SIAD.Controllers
             return Ok(usuario);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ModificarUsuario(UsuarioListViewModel modelo)
+        [HttpGet]
+        [Authorize]
+        public async Task<int> ObtenerMaxNumeroUsuario()
         {
-            if (!ModelState.IsValid)
+            var maxNumeroUsuario = await context.Users.MaxAsync(u => u.NumeroUsuario);
+
+            if (maxNumeroUsuario == 0)
             {
-                return View(modelo);
+                return 0;
             }
 
-            var usuario = await userManager.FindByIdAsync(modelo.UsuarioVM.Id);
-
-            if (usuario != null)
-            {
-                // Actualizar las propiedades del usuario con los datos del modelo
-                usuario.UserName = modelo.UsuarioVM.UserName;
-                usuario.Destino = modelo.UsuarioVM.Destino;
-                usuario.Grado = modelo.UsuarioVM.Grado;
-                usuario.Matricula = modelo.UsuarioVM.Matricula;
-                usuario.Apellido = modelo.UsuarioVM.Apellido;
-                usuario.DeptoDiv = modelo.UsuarioVM.DeptoDiv;
-                usuario.Email = modelo.UsuarioVM.Email;
-                usuario.PhoneNumber = modelo.UsuarioVM.PhoneNumber;
-
-                // Actualizar el usuario en la base de datos utilizando userManager
-                var resultado = await userManager.UpdateAsync(usuario);
-
-                if (resultado.Succeeded)
-                {
-                    // El usuario se actualizó exitosamente, ahora guarda los cambios en la base de datos
-                    await context.SaveChangesAsync();
-
-                    // Resto del código después de guardar los cambios...
-                    return RedirectToAction("Listado", new { mensaje = "Usuario modificado exitosamente" });
-                }
-                else
-                {
-                    // El usuario no se pudo actualizar, maneja el resultado de manera adecuada
-                    // y muestra mensajes de error si es necesario
-                    foreach (var error in resultado.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
-                }
-            }
-            else
-            {
-                // El usuario no se encontró, muestra un mensaje de error
-                ModelState.AddModelError("", "El usuario no existe");
-            }
-
-            return View(modelo);
+            return (maxNumeroUsuario);
         }
 
-        [AllowAnonymous]
-        public IActionResult Registro()
-        {
-            return View();
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> ModificarUsuario(UsuarioViewModel modelo)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(modelo);
+        //    }
 
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Registro(RegistroViewModel modelo)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(modelo);
-            }
+        //    var usuario = await userManager.FindByIdAsync(modelo.UsuarioVM.Id);
 
-            var nameUser = modelo.Nombre.Substring(0, 1) + modelo.Apellido;
+        //    if (usuario != null)
+        //    {
+        //        // Actualizar las propiedades del usuario con los datos del modelo
+        //        usuario.UserName = modelo.UsuarioVM.UserName;
+        //        usuario.Destino = modelo.UsuarioVM.Destino;
+        //        usuario.Grado = modelo.UsuarioVM.Grado;
+        //        usuario.Matricula = modelo.UsuarioVM.Matricula;
+        //        usuario.Apellido = modelo.UsuarioVM.Apellido;
+        //        usuario.DeptoDiv = modelo.UsuarioVM.DeptoDiv;
+        //        usuario.Email = modelo.UsuarioVM.Email;
+        //        usuario.PhoneNumber = modelo.UsuarioVM.PhoneNumber;
 
-            var usuario = new Usuario() { UserName = nameUser };
+        //        // Actualizar el usuario en la base de datos utilizando userManager
+        //        var resultado = await userManager.UpdateAsync(usuario);
 
-            userManager.Options.Password.RequiredLength = 4; // Establece la longitud mínima requerida para la contraseña (puedes ajustarlo según tus necesidades)
-            userManager.Options.Password.RequireDigit = false;
-            userManager.Options.Password.RequireLowercase = false;
-            userManager.Options.Password.RequireUppercase = false;
-            userManager.Options.Password.RequireNonAlphanumeric = false;
+        //        if (resultado.Succeeded)
+        //        {
+        //            // El usuario se actualizó exitosamente, ahora guarda los cambios en la base de datos
+        //            await context.SaveChangesAsync();
 
-            var resultado = await userManager.CreateAsync(usuario, modelo.Password);
+        //            // Resto del código después de guardar los cambios...
+        //            return RedirectToAction("Listado", new { mensaje = "Usuario modificado exitosamente" });
+        //        }
+        //        else
+        //        {
+        //            // El usuario no se pudo actualizar, maneja el resultado de manera adecuada
+        //            // y muestra mensajes de error si es necesario
+        //            foreach (var error in resultado.Errors)
+        //            {
+        //                ModelState.AddModelError("", error.Description);
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // El usuario no se encontró, muestra un mensaje de error
+        //        ModelState.AddModelError("", "El usuario no existe");
+        //    }
 
-
-
-            //var resultado = await userManager.CreateAsync(usuario, password: modelo.Password);
-
-            if (resultado.Succeeded)
-            {
-                await signInManager.SignInAsync(usuario, isPersistent: true);
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                foreach (var error in resultado.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-
-                return View(modelo);
-            }
-        }
+        //    return View(modelo);
+        //}
 
         [AllowAnonymous]
         public IActionResult Login()
@@ -265,10 +244,10 @@ namespace SIAD.Controllers
                 PhoneNumber = u.PhoneNumber
 
             }).ToListAsync();
-            var modelo = new UsuarioListViewModel();
-            modelo.ListaUsuariosVM = new ListaUsuarioViewModel(); // Inicializar la instancia de ListaUsuarios
-            modelo.ListaUsuariosVM.Usuarios = usuarios;
-            modelo.ListaUsuariosVM.Mensaje = mensaje;
+            var modelo = new ListaUsuarioViewModel();
+            modelo = new ListaUsuarioViewModel(); // Inicializar la instancia de ListaUsuarios
+            modelo.Usuarios = usuarios;
+            modelo.Mensaje = mensaje;
             return View(modelo);
         }
 
