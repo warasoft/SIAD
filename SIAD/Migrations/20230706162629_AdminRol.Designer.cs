@@ -12,8 +12,8 @@ using SIAD;
 namespace SIAD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230618020528_addAtribUser")]
-    partial class addAtribUser
+    [Migration("20230706162629_AdminRol")]
+    partial class AdminRol
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -165,8 +165,14 @@ namespace SIAD.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Apellido")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeptoDiv")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Destino")
@@ -179,8 +185,8 @@ namespace SIAD.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("int");
+                    b.Property<string>("Grado")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -188,7 +194,10 @@ namespace SIAD.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("NombreUsuario")
+                    b.Property<int>("Matricula")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
@@ -198,6 +207,9 @@ namespace SIAD.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("NumeroUsuario")
+                        .HasColumnType("int");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -209,9 +221,6 @@ namespace SIAD.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefono")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")

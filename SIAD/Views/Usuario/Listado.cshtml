@@ -50,7 +50,6 @@
                         <tbody>
                             @foreach (var usuario in Model.Usuarios)
                             {
-
                                 <tr>
                                     <td>1</td>
                                     <td>@usuario.Matricula</td>
@@ -62,9 +61,9 @@
                                     <td>@usuario.PhoneNumber</td>
                                     <td><span class="badge badge-info">Admin</span></td>
                                     <td>
-                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEdit" id="btnObtenerUsuario" onclick="obtenerUsuario('@usuario.Id')">
+                                        <a class="btn btn-primary btn-sm" asp-action="ModificarUsuario" asp-route-id="@usuario.Id">
                                             <i class="fas fa-pencil-alt"></i>
-                                        </button>
+                                        </a>
                                         <button class="btn btn-danger btn-sm">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -95,4 +94,22 @@
     <script src="~/js/vistas/UsuarioEdit.js"></script>
 <!-- SOLO ES DE EJEMPLO - IGNORAR -->
     <script src="~/js/vistas/datatables-demo.js"></script>
+    <script>
+        function formarNombreUsuario() {
+            // Realizar la solicitud AJAX al controlador
+            $.ajax({
+                url: `/Usuario/ObtenerMaxNumeroUsuario`,
+                method: 'GET',
+                success: function (data) {
+                    var numeroNuevo = data + 1;
+                    var nombreUsuario = 'SIAD' + numeroNuevo;
+                    document.getElementById('nombreUsuarioInput').value = nombreUsuario;
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+    </script>
 }

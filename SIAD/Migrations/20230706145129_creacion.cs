@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SIAD.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class creacion : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,6 +28,13 @@ namespace SIAD.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    NumeroUsuario = table.Column<int>(type: "int", nullable: false),
+                    Matricula = table.Column<int>(type: "int", nullable: false),
+                    Grado = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Apellido = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Destino = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeptoDiv = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

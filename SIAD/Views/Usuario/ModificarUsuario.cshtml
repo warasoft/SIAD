@@ -1,6 +1,6 @@
 ﻿@model UsuarioViewModel
 @{
-    ViewData["Title"] = "AltaUsuario";
+    ViewData["Title"] = "ModificarUsuario";
 }
 
 @section Estilos {
@@ -12,13 +12,13 @@
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-header py-3 bg-second-primary">
-            <h6 class="m-0 font-weight-bold text-white">Nuevo Usuario</h6>
-        </div>
+        <h6 class="m-0 font-weight-bold text-white">Modificar Usuario</h6>
+    </div>
     <div class="card-body">
-            <hr />
-            <div class="row">
-                <div class="col-sm-12">
-                    <form asp-action="AltaUsuario">
+        <hr />
+        <div class="row">
+            <div class="col-sm-12">
+                <form asp-action="ModificarUsuario">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" value="0" id="txtId">
                     <div class="row">
@@ -28,7 +28,7 @@
                                     <label for="txtNombreUsuario">Usuario asignado:</label>
                                 </div>
                                 <div class="form-group col-sm-6">
-                                    <input type="text" class="form-control form-control-sm input-validar" id="nombreUsuarioInput" readonly value="@Model.NombreUsuario" asp-for="NombreUsuario">
+                                    <input type="text" class="form-control form-control-sm input-validar" id="nombreUsuarioInput" readonly asp-for="NombreUsuario">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -73,7 +73,6 @@
                             <div class="form-row">
                                 <div class="form-group col-sm-6">
                                     <input type="password" class="form-control form-control-sm input-validar" id="passwordHash" placeholder="Password" asp-for="Password">
-                                    <span asp-validation-for="Password" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -105,10 +104,10 @@
                         </a>
                     </div>
                 </form>
-                </div>
             </div>
         </div>
- </div>
+    </div>
+</div>
 
 @section Scripts{
     <!-- ============================================================
@@ -126,5 +125,26 @@
     <script src="~/js/vistas/UsuarioEdit.js"></script>
     <!-- SOLO ES DE EJEMPLO - IGNORAR -->
     <script src="~/js/vistas/datatables-demo.js"></script>
+
+    <script>
+        function formarNombreUsuario() {
+            // Realizar la solicitud AJAX al controlador
+            $.ajax({
+                url: `/Usuario/ObtenerMaxNumeroUsuario`,
+                method: 'GET',
+                success: function (data) {
+                    var numeroNuevo = data + 1;
+                    var nombreUsuario = 'SIAD' + numeroNuevo;
+                    document.getElementById('nombreUsuarioInput').value = nombreUsuario;
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+    </script>
 }
+
+
 

@@ -7,6 +7,7 @@ namespace SIAD.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public int NumeroUsuario { get; set; }
 
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "El campo {0} debe contener solo números")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public int Matricula { get; set; }
 
@@ -25,9 +26,10 @@ namespace SIAD.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string DeptoDiv { get; set; }
 
-        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [EmailAddress(ErrorMessage = "El campo {0} debe ser un correo electrónico válido")]
         public string Email { get; set; }
 
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "El campo {0} debe contener solo números")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Interno { get; set; }
 
