@@ -7,6 +7,8 @@ using SIAD.Models;
 using SIAD.Servicios;
 using SIAD.Entidades;
 using Microsoft.DotNet.Scaffolding.Shared.Project;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Security.Cryptography;
 
 namespace SIAD.Controllers
 {
@@ -24,55 +26,18 @@ namespace SIAD.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Registro()
-        {
-            return View();
-        }
-
-        [HttpGet]
         [Authorize]
         public IActionResult Perfil()
         {
             return View();
         }
 
-
         [HttpGet]
         [Authorize]
         public IActionResult AltaUsuario()
         {
-            UsuarioViewModel nomUs = new UsuarioViewModel();
-            nomUs.NombreUsuario = GenerarNomUsuario();
-            return View(nomUs);
-        }
-
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> ModificarUsuario(string id)
-        {
-            var usuario = await userManager.FindByIdAsync(id);
-
-            if (usuario is null)
-            {
-                return NotFound();
-            }
-
-            var usuarioViewModel = new UsuarioViewModel
-            {
-                // Asignar las propiedades del usuario a las propiedades correspondientes del UsuarioViewModel
-                Matricula = usuario.Matricula,
-                Grado = usuario.Grado,
-                Apellido = usuario.Apellido,
-                Nombre = usuario.Nombre,
-                Destino = usuario.Destino,
-                DeptoDiv = usuario.DeptoDiv,
-                Interno = usuario.PhoneNumber,
-                Email = usuario.Email,
-                Password = usuario.PasswordHash
-            };
-
-            return View(usuarioViewModel);
+            ViewBag.NomUs = GenerarNomUsuario();
+            return View();
         }
 
         [HttpPost]
@@ -81,6 +46,7 @@ namespace SIAD.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.NomUs = GenerarNomUsuario();
                 return View(modelo);
             }
 
@@ -131,58 +97,115 @@ namespace SIAD.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ModificarUsuario(string id)
+        {
+            var usuario = await userManager.FindByIdAsync(id);
+
+            if (usuario is null)
+            {
+                return NotFound();
+            }
+
+            var usuarioViewModel = new UsuarioViewModel
+            {
+                NombreUsuario = usuario.UserName,
+                Matricula = usuario.Matricula,
+                Grado = usuario.Grado,
+                Apellido = usuario.Apellido,
+                Nombre = usuario.Nombre,
+                Destino = usuario.Destino,
+                DeptoDiv = usuario.DeptoDiv,
+                Interno = usuario.PhoneNumber,
+                Email = usuario.Email,
+                Password = usuario.PasswordHash
+            };
+
+            return View(usuarioViewModel);
+        }
+
         [HttpPost]
         [Authorize]
-        //public async Task<IActionResult> ModificarUsuario(UsuarioViewModel modelo)
+        public async Task<IActionResult> ModificarUsuario(UsuarioViewModel modelo)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return View(modelo);
+            }
+
+            var usuario = await userManager.FindByNameAsync(modelo.NombreUsuario);
+
+            if (modelo.Password == "0000")
+            {
+                modelo.Password = usuario.PasswordHash;
+            }
+
+            
+
+            if (usuario != null)
+            {
+                usuario.Matricula = modelo.Matricula;
+                usuario.Grado = modelo.Grado;
+                usuario.Apellido = modelo.Apellido;
+                usuario.Nombre = modelo.Nombre;
+                usuario.Destino = modelo.Destino;
+                usuario.DeptoDiv = modelo.DeptoDiv;
+                usuario.Email = modelo.Email;
+                usuario.PhoneNumber = modelo.Interno;
+
+                
+                userManager.Options.Password.RequiredLength = 4; // Establece la longitud mínima requerida para la contraseña (puedes ajustarlo según tus necesidades)
+                userManager.Options.Password.RequireDigit = false;
+                userManager.Options.Password.RequireLowercase = false;
+                userManager.Options.Password.RequireUppercase = false;
+                userManager.Options.Password.RequireNonAlphanumeric = false;
+
+
+
+
+
+                var resultado = await userManager.UpdateAsync(usuario);
+
+                //var resultado = await userManager.UpdateAsync(usuario);
+
+
+                if (resultado.Succeeded)
+                {
+                    // El usuario se actualizó exitosamente, ahora guarda los cambios en la base de datos
+                    await context.SaveChangesAsync();
+
+                    // Resto del código después de guardar los cambios...
+                    return RedirectToAction("Listado", new { mensaje = "Usuario modificado exitosamente" });
+                }
+                else
+                {
+                    // El usuario no se pudo actualizar, maneja el resultado de manera adecuada
+                    // y muestra mensajes de error si es necesario
+                    foreach (var error in resultado.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+            }
+            else
+            {
+                // El usuario no se encontró, muestra un mensaje de error
+                ModelState.AddModelError("", "El usuario no existe");
+            }
+
+            return View(modelo);
+        }
+
+        //public string CambioPassword(UsuarioViewModel modelo)
         //{
-        //    if (!ModelState.IsValid)
+        //    if (modelo == null)
         //    {
-        //        return View(modelo);
+
         //    }
-
-        //    var usuario = await userManager.FindByIdAsync(modelo.Id);
-
-        //    if (usuario != null)
-        //    {
-        //        // Actualizar las propiedades del usuario con los datos del modelo
-        //        usuario.Matricula = modelo.Matricula;
-        //        usuario.Grado = modelo.Grado;
-        //        usuario.Apellido = modelo.Apellido;
-        //        usuario.Nombre = modelo.Nombre;
-        //        usuario.Destino = modelo.Destino;
-        //        usuario.DeptoDiv = modelo.DeptoDiv;
-        //        usuario.Email = modelo.Email;
-        //        usuario.PhoneNumber = modelo.Interno;
-        //        usuario.PasswordHash = modelo.Password;
-
-        //        // Actualizar el usuario en la base de datos utilizando userManager
-        //        var resultado = await userManager.UpdateAsync(usuario);
-
-        //        if (resultado.Succeeded)
-        //        {
-        //            // El usuario se actualizó exitosamente, ahora guarda los cambios en la base de datos
-        //            await context.SaveChangesAsync();
-
-        //            // Resto del código después de guardar los cambios...
-        //            return RedirectToAction("Listado", new { mensaje = "Usuario modificado exitosamente" });
-        //        }
-        //        else
-        //        {
-        //            // El usuario no se pudo actualizar, maneja el resultado de manera adecuada
-        //            // y muestra mensajes de error si es necesario
-        //            foreach (var error in resultado.Errors)
-        //            {
-        //                ModelState.AddModelError("", error.Description);
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // El usuario no se encontró, muestra un mensaje de error
-        //        ModelState.AddModelError("", "El usuario no existe");
-        //    }
-
-        //    return View(modelo);
+        //    var nuevoPass = userManager.ChangePasswordAsync(Usuario, Usuario.password, modelo.Password);
         //}
 
         [Authorize]
@@ -329,6 +352,13 @@ namespace SIAD.Controllers
             await userManager.RemoveFromRoleAsync(usuario, Constantes.RolAdmin);
 
             return RedirectToAction("Listado", routeValues: new { mensaje = "Rol removido correctamente a " + email });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Registro()
+        {
+            return View();
         }
 
         [HttpPost]

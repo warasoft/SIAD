@@ -28,13 +28,14 @@
                                     <label for="txtNombreUsuario">Usuario asignado:</label>
                                 </div>
                                 <div class="form-group col-sm-6">
-                                    <input type="text" class="form-control form-control-sm input-validar" id="nombreUsuarioInput" readonly value="@Model.NombreUsuario" asp-for="NombreUsuario">
+                                    <input type="text" class="form-control form-control-sm input-validar" id="nombreUsuarioInput" readonly value="@ViewBag.NomUs" asp-for="NombreUsuario">
+
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-sm-6">
-                                    <input type="text" class="form-control form-control-sm input-validar" id="Matricula" placeholder="Matricula" asp-for="Matricula">
-                                    <span asp-validation-for="Matricula" class="text-danger"></span>
+                                    <input type="text" class="form-control form-control-sm input-validar" id="Matricula" placeholder="Destino" asp-for="Matricula">
+                                    <span asp-validation-for="Destino" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <input type="text" class="form-control form-control-sm input-validar" id="grado" placeholder="Grado" asp-for="Grado">
